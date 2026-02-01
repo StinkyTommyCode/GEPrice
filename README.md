@@ -87,8 +87,7 @@ Error Response
 
 #### Item Information
 
-This endpoint returns the information about a specific item, with
-optional query parameters to handle paging (default page=0, pageSize=20)
+This endpoint returns the information about a specific item
 
 Example Endpoint
 
@@ -191,7 +190,7 @@ Example Response
             "type": "Miscellaneous",
             "icon": "51817_icon.gif",
             "iconLarge": "51817_icon_large.gif",
-            "wikiUrl": "https://runescape.wiki/w/Scripture_of_Wen",
+            "wikiUrl": "https://runescape.wiki/w/Manuscript_of_Wen",
             "members": true
         }
     ]
