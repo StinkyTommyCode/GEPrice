@@ -2,7 +2,7 @@ package com.geprice.controller;
 
 import com.geprice.Util;
 import com.geprice.pojo.*;
-import com.geprice.repository.BossDropRepo;
+import com.geprice.repository.BossItemRepo;
 import com.geprice.repository.BossRepo;
 import com.geprice.repository.ItemRepo;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,21 +26,22 @@ public class ItemController {
 
     private final ItemRepo itemRepo;
     private final BossRepo bossRepo;
-    private final BossDropRepo bossDropRepo;
+    private final BossItemRepo bossItemRepo;
 
-    ItemController(ItemRepo itemRepo, BossRepo bossRepo, BossDropRepo bossDropRepo) {
+    ItemController(ItemRepo itemRepo, BossRepo bossRepo, BossItemRepo bossItemRepo) {
         this.itemRepo = itemRepo;
         this.bossRepo = bossRepo;
-        this.bossDropRepo = bossDropRepo;
+        this.bossItemRepo = bossItemRepo;
     }
 
     @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public String getItem(@PathVariable String id, HttpServletResponse response) {
         Optional<Item> item = itemRepo.findById(Integer.parseInt(id));
         if(item.isPresent()) {
-            log.debug("Item {} with id {} found}", item.get().getName(), id);
+            log.debug("Item {} with id {} found", item.get().getName(), id);
             return Util.toJson(item.get());
         } else {
+            log.warn("Item with id {} not found", id);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return Util.toJson(GEPriceError.builder().error("Item not found").build());
         }
@@ -69,16 +70,16 @@ public class ItemController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return Util.toJson(GEPriceError.builder().error("Boss not found").build());
         }
-        BossDrops.BossDropsBuilder bossDrops = BossDrops.builder();
-        bossDrops.boss(boss.get());
+        BossItems.BossItemsBuilder bossItem = BossItems.builder();
+        bossItem.boss(boss.get());
 
-        List<BossDrop> bossDropsRaw = bossDropRepo.findAllByBossId(boss.get().getId());
+        List<BossItem> bossDropsRaw = bossItemRepo.findAllByBossId(Integer.parseInt(bossId));
         if(bossDropsRaw.isEmpty()) {
             log.warn("No items found for boss {}", bossId);
         }
 
         List<Item> bossDropItems = new ArrayList<>();
-        for(BossDrop bossDrop : bossDropsRaw) {
+        for(BossItem bossDrop : bossDropsRaw) {
             Optional<Item> item = itemRepo.findById(bossDrop.getItemId());
             if(item.isPresent()) {
                 log.debug("Item {} with id {} found for boss {}", item.get().getName(), bossDrop.getItemId(), bossDrop.getBossId());
@@ -88,7 +89,7 @@ public class ItemController {
             }
         }
 
-        bossDrops.items(bossDropItems);
-        return Util.toJson(bossDrops.build());
+        bossItem.items(bossDropItems);
+        return Util.toJson(bossItem.build());
     }
 }

@@ -1,31 +1,18 @@
 package com.geprice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
-
-import java.io.File;
-import java.util.List;
 
 public class Util {
-    private static final ObjectMapper MAPPER;
-
-    static {
-        MAPPER = new ObjectMapper();
-    }
+    private static final ObjectMapper MAPPER= new ObjectMapper();
+    public static final Logger log = LoggerFactory.getLogger(Util.class);
 
     public static String toJson(Object o) {
         return MAPPER.writeValueAsString(o);
     }
 
-    public static <T> T fromJson(String json, Class<T> clazz) {
-        return MAPPER.readValue(json, clazz);
-    }
-
-    public static <T> T fromObjectNode(ObjectNode node, Class<T> clazz) {
-        return MAPPER.convertValue(node, clazz);
-    }
-
-    public static <T> List<T> listFromFile(File file, Class<T> clazz) {
-        return MAPPER.readValue(file, MAPPER.getTypeFactory().constructCollectionType(List.class, clazz));
+    public static void logMissingSubmission(String id) {
+        log.warn("Submission with id {} not found", id);
     }
 }

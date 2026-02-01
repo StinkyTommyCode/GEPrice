@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class BossDrops {
+public class BossItems {
     private Boss boss;
     private List<Item> items;
 }

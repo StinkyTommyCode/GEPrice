@@ -1,29 +1,46 @@
 package com.geprice.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.Instant;
 
 @Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Table(name = "item")
 public class Item {
-    private @NonNull @Id Integer id;
-    private @NonNull @Column(length = 255) String name;
-    private @NonNull @Column(length = 255) @JsonIgnore String nameUpper;
-    private @Lob String description;
-    private @Column(length = 100) String type;
-    private @Lob String icon;
-    private @Lob String iconLarge;
-    private @Lob String wikiUrl;
+    @Id
+    @NonNull
+    @Column(name = "id")
+    private Integer id;
+
+    @NonNull
+    @Column(name = "name")
+    private String name;
+
+    @NonNull
+    @Column(name = "description")
+    private String description;
+
+    @JsonIgnore
+    @NonNull
+    @Column(name = "name_upper")
+    private String nameUpper;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "icon")
+    private String icon;
+
+    @Column(name = "icon_large")
+    private String iconLarge;
+
+    @Column(name = "wiki_url")
+    private String wikiUrl;
+
+    @Column(name = "is_members")
     private boolean isMembers;
 }

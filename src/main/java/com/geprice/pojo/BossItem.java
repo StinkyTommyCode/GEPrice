@@ -8,8 +8,14 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BossDrop {
-    private @Id @GeneratedValue Long id;
+@Table(name = "boss_item")
+@IdClass(BossItemKey.class)
+public class BossItem {
+    @Id
+    @Column(name = "boss_id")
     private int bossId;
+
+    @Id
+    @Column(name = "item_id")
     private int itemId;
 }

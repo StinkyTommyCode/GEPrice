@@ -1,18 +1,32 @@
 package com.geprice.pojo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 
 @Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "boss")
 public class Boss {
-    private @NonNull @Id Integer id;
-    private @NonNull @Lob String name;
-    private @Lob String wikiUrl;
-    private @Lob String icon;
+    @Id
+    @NonNull
+    @Column(name = "id")
+    private Integer id;
+
+    @NonNull
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "wiki_url")
+    private String wikiUrl;
+
+    @Column(name = "icon")
+    private String icon;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
 }

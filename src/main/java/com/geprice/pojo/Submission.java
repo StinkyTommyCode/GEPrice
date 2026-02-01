@@ -1,6 +1,5 @@
 package com.geprice.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,17 +10,47 @@ import java.time.Instant;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Table(name = "submission")
 public class Submission {
-    private @Id @GeneratedValue Long id;
-    private @NonNull @Lob String userId;
+    @Id
+    @GeneratedValue
+    @SequenceGenerator(name = "submission_seq", allocationSize = 1)
+    @Column(name = "id")
+    private Long id;
+
+    @NonNull
+    @Column(name = "user_id")
+    private String userId;
+
+    @Column(name = "item_id")
     private int itemId;
-    private @NonNull Status status;
+
+    @Enumerated(EnumType.STRING)
+    @NonNull
+    @Column(name = "status")
+    private  Status status;
+
+    @Column(name = "value")
     private long value;
-    private Boolean flagged;
-    private Boolean approved;
-    private Boolean listed;
+
+    @NonNull
+    @Column(name = "timestamp")
+    private Instant timestamp;
+
+    @Column(name = "flagged")
+    private boolean flagged;
+
+    @Column(name = "approved")
+    private boolean approved;
+
+    @Column(name = "listed")
+    private boolean listed;
+
+    @Column(name = "created_at")
     private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     private enum Status {
         buy, sell, instant_buy, instant_sell
