@@ -61,16 +61,16 @@ This endpoint returns the information about a specific boss
 Example Endpoint
 
 ```
-GET <api_endpoint>/api/bosses/27795
+GET <api_endpoint>/api/bosses/1
 ```
 
 Example Response
 ```json
 {
-    "id": 27795,
+    "id": 1,
     "name": "Arch-Glacor",
     "wikiUrl": "https://runescape.wiki/w/Arch-Glacor",
-    "icon": "https://runescape.wiki/w/File:Arch-Glacor.png"
+    "icon": "Arch-Glacor.png"
 }
 ```
 
@@ -160,7 +160,7 @@ Ths endpoing allows you to retrieve all items which are dropped from a given bos
 Example Endpoint
 
 ```
-GET <api_endpoint>/api/items/boss/27795
+GET <api_endpoint>/api/items/boss/1
 ```
 
 Example Response
@@ -168,10 +168,10 @@ Example Response
 ```json
 {
     "boss": {
-        "id": 27795,
+        "id": 1,
         "name": "Arch-Glacor",
         "wikiUrl": "https://runescape.wiki/w/Arch-Glacor",
-        "icon": "https://runescape.wiki/w/File:Arch-Glacor.png"
+        "icon": "Arch-Glacor.png"
     },
     "items": [
         {
