@@ -93,7 +93,7 @@ optional query parameters to handle paging (default page=0, pageSize=20)
 Example Endpoint
 
 ``` 
-<api_endpoint>/api/items/20266
+GET <api_endpoint>/api/items/20266
 ```
 
 Example Response
@@ -119,7 +119,7 @@ the search query, with optional query parameters to handle paging
 Example Endpoint
 
 ``` 
-<api_endpoint>/api/items/search/ash?pageNumber=0&pageSize=2
+GET <api_endpoint>/api/items/search/ash?pageNumber=0&pageSize=2
 ```
 
 Example Response
@@ -153,9 +153,17 @@ Example Response
 }
 ```
 
+#### Items By Boss
+
+Ths endpoing allows you to retrieve all items which are dropped from a given boss
+
+Example Endpoint
+
 ```
-http://localhost:8080/api/items/boss/27795
+GET <api_endpoint>/api/items/boss/27795
 ```
+
+Example Response
 
 ```json
 {
@@ -187,5 +195,13 @@ http://localhost:8080/api/items/boss/27795
             "members": true
         }
     ]
+}
+```
+
+Example Error
+
+```json
+{
+    "error": "Boss not found"
 }
 ```
