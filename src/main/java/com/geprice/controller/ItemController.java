@@ -40,6 +40,11 @@ public class ItemController {
         this.categoryItemRepo = categoryItemRepo;
     }
 
+    @GetMapping("/all")
+    public List<Item> getAll() {
+        return itemRepo.findAll();
+    }
+
     @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public String getItem(@PathVariable String id, HttpServletResponse response) {
         Optional<Item> item = itemRepo.findById(Integer.parseInt(id));
