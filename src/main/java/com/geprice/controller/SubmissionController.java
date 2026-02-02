@@ -1,16 +1,17 @@
 package com.geprice.controller;
 
+import com.geprice.Constants;
 import com.geprice.Util;
-import com.geprice.pojo.GEPriceError;
+import com.geprice.error.GEPrice404Error;
 import com.geprice.pojo.Item;
 import com.geprice.pojo.Submission;
 import com.geprice.pojo.SubmissionsPaged;
 import com.geprice.repository.ItemRepo;
 import com.geprice.repository.SubmissionRepo;
-import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Clock;
@@ -26,12 +27,14 @@ public class SubmissionController {
     private final SubmissionRepo submissionRepo;
     private final ItemRepo itemRepo;
 
+    private static final Logger log = LoggerFactory.getLogger(SubmissionController.class);
+
     public SubmissionController(SubmissionRepo submissionRepo, ItemRepo itemRepo) {
         this.submissionRepo = submissionRepo;
         this.itemRepo = itemRepo;
     }
 
-    @GetMapping(path = "/recent", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping("/recent")
     public SubmissionsPaged getRecent(@RequestParam(value = "pageSize", required = false, defaultValue = "20") String pageSize,
                                       @RequestParam(value = "pageNumber", required = false, defaultValue = "0") String pageNumber) {
         List<Submission> submissions = submissionRepo.findAllByApprovedAndListed(true, true, PageRequest.of(Integer.parseInt(pageNumber),
@@ -44,7 +47,7 @@ public class SubmissionController {
                 .build();
     }
 
-    @GetMapping(path = "/flagged", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping("/flagged")
     public SubmissionsPaged getFlagged(@RequestParam(value = "pageSize", required = false, defaultValue = "20") String pageSize,
                                        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") String pageNumber) {
         List<Submission> submissions = submissionRepo.findAllByFlagged(true, PageRequest.of(Integer.parseInt(pageNumber),
@@ -56,7 +59,7 @@ public class SubmissionController {
                 .build();
     }
 
-    @GetMapping(path = "/pending", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping("/pending")
     public SubmissionsPaged getPending(@RequestParam(value = "pageSize", required = false, defaultValue = "20") String pageSize,
                                        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") String pageNumber) {
         List<Submission> submissions = submissionRepo.findAllByApproved(false, PageRequest.of(Integer.parseInt(pageNumber),
@@ -68,8 +71,8 @@ public class SubmissionController {
                 .build();
     }
 
-    @PostMapping(path = "/", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String create(@RequestBody Submission submission, HttpServletResponse response) {
+    @PostMapping
+    public Submission create(@RequestBody Submission submission) {
         Optional<Item> item = itemRepo.findById(submission.getItemId());
         if (item.isPresent()) {
             Submission created = Submission.builder()
@@ -85,71 +88,65 @@ public class SubmissionController {
                     .updatedAt(Instant.now(Clock.systemUTC()))
                     .build();
 
-            return Util.toJson(submissionRepo.save(created));
+            return submissionRepo.save(created);
         } else {
-            Util.log.warn("Item with id {} not found", submission.getItemId());
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Item not found").build());
+            log.warn("Item with id {} not found", submission.getItemId());
+            throw new GEPrice404Error(Constants.ITEM_NOT_FOUND);
         }
     }
 
-    @PatchMapping(path = "/{id}/approve", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String approve(@PathVariable String id, HttpServletResponse response) {
+    @PatchMapping("/{id}/approve")
+    public Submission approve(@PathVariable String id) {
         Optional<Submission> submission = submissionRepo.findById(Long.parseLong(id));
-
         if(submission.isPresent()) {
-            return Util.toJson(submissionRepo.save(submission.get().toBuilder()
+            return submissionRepo.save(submission.get().toBuilder()
                     .approved(true)
-                    .updatedAt(Instant.now()).build()));
+                    .updatedAt(Instant.now()).build());
         } else {
             Util.logMissingSubmission(id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Submission not found").build());
+            throw new GEPrice404Error(Constants.SUBMISSION_NOT_FOUND);
         }
     }
 
-    @PatchMapping(path = "/{id}/flag", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String flag(@PathVariable String id, HttpServletResponse response) {
+    @PatchMapping("/{id}/flag")
+    public Submission flag(@PathVariable String id) {
         Optional<Submission> submission = submissionRepo.findById(Long.parseLong(id));
 
         if(submission.isPresent()) {
-            return Util.toJson(submissionRepo.save(submission.get().toBuilder()
+            return submissionRepo.save(submission.get().toBuilder()
                     .flagged(true)
-                    .updatedAt(Instant.now()).build()));
+                    .updatedAt(Instant.now()).build());
         } else {
             Util.logMissingSubmission(id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Submission not found").build());
+            throw new GEPrice404Error(Constants.SUBMISSION_NOT_FOUND);
         }
     }
 
-    @PatchMapping(path = "/{id}/unflag", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String unflag(@PathVariable String id, HttpServletResponse response) {
+    @PatchMapping("/{id}/unflag")
+    public Submission unflag(@PathVariable String id) {
         Optional<Submission> submission = submissionRepo.findById(Long.parseLong(id));
 
         if(submission.isPresent()) {
-            return Util.toJson(submissionRepo.save(submission.get().toBuilder()
+            return submissionRepo.save(submission.get().toBuilder()
                     .flagged(false)
-                    .updatedAt(Instant.now()).build()));
+                    .updatedAt(Instant.now()).build());
         } else {
             Util.logMissingSubmission(id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Submission not found").build());
+            throw new GEPrice404Error(Constants.SUBMISSION_NOT_FOUND);
         }
     }
 
-    @DeleteMapping(path = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String delete(@PathVariable String id, HttpServletResponse response) {
+    @DeleteMapping("/{id}")
+    public Submission delete(@PathVariable String id) {
         Optional<Submission> submission = submissionRepo.findById(Long.parseLong(id));
 
         if(submission.isPresent()) {
-            return Util.toJson(submissionRepo.save(submission.get().toBuilder()
+            return submissionRepo.save(submission.get().toBuilder()
                     .listed(false)
-                    .updatedAt(Instant.now()).build()));
+                    .updatedAt(Instant.now()).build());
         } else {
             Util.logMissingSubmission(id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Submission not found").build());
+            throw new GEPrice404Error(Constants.SUBMISSION_NOT_FOUND);
         }
     }
 }

@@ -1,18 +1,17 @@
 package com.geprice.controller;
 
-import com.geprice.Util;
+import com.geprice.Constants;
+import com.geprice.error.GEPrice404Error;
 import com.geprice.pojo.*;
 import com.geprice.repository.BossItemRepo;
 import com.geprice.repository.BossRepo;
 import com.geprice.repository.CategoryItemRepo;
 import com.geprice.repository.CategoryRepo;
 import com.geprice.repository.ItemRepo;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -48,20 +47,19 @@ public class ItemController {
                 .toList();
     }
 
-    @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String getItem(@PathVariable String id, HttpServletResponse response) {
+    @GetMapping("/{id}")
+    public Item getItem(@PathVariable String id) {
         Optional<Item> item = itemRepo.findById(Integer.parseInt(id));
         if(item.isPresent()) {
             log.debug("Item {} with id {} found", item.get().getName(), id);
-            return Util.toJson(item.get());
+            return item.get();
         } else {
             log.warn("Item with id {} not found", id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Item not found").build());
+            throw new GEPrice404Error(Constants.ITEM_NOT_FOUND);
         }
     }
 
-    @GetMapping(value = "/search/{query}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping("/search/{query}")
     public ItemsPaged getItems(@PathVariable String query,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "20") String pageSize,
                                @RequestParam(value = "pageNumber", required = false, defaultValue = "0") String pageNumber) {
@@ -76,13 +74,12 @@ public class ItemController {
                .build();
     }
 
-    @GetMapping(value = "/boss/{bossId}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String getBoss(@PathVariable String bossId, HttpServletResponse response) {
+    @GetMapping("/boss/{bossId}")
+    public BossItems getBoss(@PathVariable String bossId) {
         Optional<Boss> boss = bossRepo.findById(Integer.parseInt(bossId));
         if(boss.isEmpty()) {
             log.error("Boss {} not found", bossId);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Boss not found").build());
+            throw new  GEPrice404Error("Boss not found");
         }
         BossItems.BossItemsBuilder bossItem = BossItems.builder();
         bossItem.boss(boss.get());
@@ -104,16 +101,15 @@ public class ItemController {
         }
 
         bossItem.items(bossDropItems);
-        return Util.toJson(bossItem.build());
+        return bossItem.build();
     }
 
-    @GetMapping(value = "/category/{categoryId}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String getCategory(@PathVariable String categoryId, HttpServletResponse response) {
+    @GetMapping("/category/{categoryId}")
+    public CategoryItems getCategory(@PathVariable String categoryId) {
         Optional<Category> category = categoryRepo.findById(Integer.parseInt(categoryId));
         if(category.isEmpty()) {
             log.error("Category {} not found", categoryId);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Category not found").build());
+            throw new GEPrice404Error("Category not found");
         }
         CategoryItems.CategoryItemsBuilder categoryItems = CategoryItems.builder();
         categoryItems.category(category.get());
@@ -135,6 +131,6 @@ public class ItemController {
         }
 
         categoryItems.items(categoryDropItems);
-        return Util.toJson(categoryItems.build());
+        return categoryItems.build();
     }
 }

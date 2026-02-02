@@ -1,13 +1,12 @@
 package com.geprice.controller;
 
+import com.geprice.Constants;
 import com.geprice.Util;
+import com.geprice.error.GEPrice404Error;
 import com.geprice.pojo.Boss;
-import com.geprice.pojo.GEPriceError;
 import com.geprice.repository.BossRepo;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,25 +27,17 @@ public class BossController {
         this.bossRepo = bossRepo;
     }
 
-    @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public String getBoss(@PathVariable String id, HttpServletResponse response) {
-        int bossId;
-        try {
-            bossId = Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            log.warn("Invalid boss id format: {}", id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Boss not found").build());
-        }
+    @GetMapping("/{id}")
+    public Boss getBoss(@PathVariable String id) {
+        int bossId = Util.validateIntegerParameter(id, Constants.BOSS_NOT_FOUND);
 
         Optional<Boss> boss = bossRepo.findById(bossId);
         if(boss.isPresent()) {
             log.debug("Boss found: {}", boss.get().getName());
-            return Util.toJson(boss.get());
+            return boss.get();
         } else {
             log.warn("Boss not found: {}", id);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return Util.toJson(GEPriceError.builder().error("Boss not found").build());
+            throw new GEPrice404Error(Constants.BOSS_NOT_FOUND);
         }
     }
 
