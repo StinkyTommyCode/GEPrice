@@ -23,14 +23,11 @@ public class Item {
     @NonNull
     @Column(name = "description")
     private String description;
-
+    
     @JsonIgnore
     @NonNull
     @Column(name = "name_upper")
     private String nameUpper;
-
-    @Column(name = "type")
-    private String type;
 
     @Column(name = "icon")
     private String icon;
@@ -40,7 +37,4 @@ public class Item {
 
     @Column(name = "wiki_url")
     private String wikiUrl;
-
-    @Column(name = "is_members")
-    private boolean isMembers;
 }

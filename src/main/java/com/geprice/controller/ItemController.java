@@ -4,6 +4,8 @@ import com.geprice.Util;
 import com.geprice.pojo.*;
 import com.geprice.repository.BossItemRepo;
 import com.geprice.repository.BossRepo;
+import com.geprice.repository.CategoryItemRepo;
+import com.geprice.repository.CategoryRepo;
 import com.geprice.repository.ItemRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -27,11 +29,15 @@ public class ItemController {
     private final ItemRepo itemRepo;
     private final BossRepo bossRepo;
     private final BossItemRepo bossItemRepo;
+    private final CategoryRepo categoryRepo;
+    private final CategoryItemRepo categoryItemRepo;
 
-    ItemController(ItemRepo itemRepo, BossRepo bossRepo, BossItemRepo bossItemRepo) {
+    ItemController(ItemRepo itemRepo, BossRepo bossRepo, BossItemRepo bossItemRepo, CategoryRepo categoryRepo, CategoryItemRepo categoryItemRepo) {
         this.itemRepo = itemRepo;
         this.bossRepo = bossRepo;
         this.bossItemRepo = bossItemRepo;
+        this.categoryRepo = categoryRepo;
+        this.categoryItemRepo = categoryItemRepo;
     }
 
     @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
@@ -91,5 +97,36 @@ public class ItemController {
 
         bossItem.items(bossDropItems);
         return Util.toJson(bossItem.build());
+    }
+
+    @GetMapping(value = "/category/{categoryId}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public String getCategory(@PathVariable String categoryId, HttpServletResponse response) {
+        Optional<Category> category = categoryRepo.findById(Integer.parseInt(categoryId));
+        if(category.isEmpty()) {
+            log.error("Category {} not found", categoryId);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return Util.toJson(GEPriceError.builder().error("Category not found").build());
+        }
+        CategoryItems.CategoryItemsBuilder categoryItems = CategoryItems.builder();
+        categoryItems.category(category.get());
+
+        List<CategoryItem> categoryItemsRaw = categoryItemRepo.findAllByCategoryId(Integer.parseInt(categoryId));
+        if(categoryItemsRaw.isEmpty()) {
+            log.warn("No items found for category {}", categoryId);
+        }
+
+        List<Item> categoryDropItems = new ArrayList<>();
+        for(CategoryItem categoryItem : categoryItemsRaw) {
+            Optional<Item> item = itemRepo.findById(categoryItem.getItemId());
+            if(item.isPresent()) {
+                log.debug("Item {} with id {} found for category {}", item.get().getName(), categoryItem.getItemId(), categoryId);
+                categoryDropItems.add(item.get());
+            } else {
+                log.warn("Item with id {} not found for category {}", categoryItem.getItemId(), categoryId);
+            }
+        }
+
+        categoryItems.items(categoryDropItems);
+        return Util.toJson(categoryItems.build());
     }
 }
