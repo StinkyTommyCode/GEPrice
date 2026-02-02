@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -41,8 +42,10 @@ public class ItemController {
     }
 
     @GetMapping("/all")
-    public List<Item> getAll() {
-        return itemRepo.findAll();
+    public List<Map<String, Object>> getAll() {
+        return itemRepo.findAll().stream()
+                .<Map<String, Object>>map(item -> Map.of("id", item.getId(), "name", item.getName()))
+                .toList();
     }
 
     @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
