@@ -11,7 +11,7 @@ is up
 
 Example Endpoint
 ```
-GET <api_endpoint>/api/health
+GET https://api.geprice.com/api/health
 ```
 
 Example Response 
@@ -31,7 +31,7 @@ This endpoint returns information about all bosses
 Example Endpoint
 
 ```
-GET <api_endpoint>/api/bosses/all
+GET https://api.geprice.com/api/bosses/all
 ```
 
 Example Response
@@ -61,7 +61,7 @@ This endpoint returns the information about a specific boss
 Example Endpoint
 
 ```
-GET <api_endpoint>/api/bosses/1
+GET https://api.geprice.com/api/bosses/1
 ```
 
 Example Response
@@ -81,8 +81,6 @@ Error Response
 }
 ```
 
-### Submissions
-
 ### Items
 
 #### Item Information
@@ -92,7 +90,7 @@ This endpoint returns the information about a specific item
 Example Endpoint
 
 ``` 
-GET <api_endpoint>/api/items/20266
+GET https://api.geprice.com/api/items/20266
 ```
 
 Example Response
@@ -118,7 +116,7 @@ the search query, with optional query parameters to handle paging
 Example Endpoint
 
 ``` 
-GET <api_endpoint>/api/items/search/ash?pageNumber=0&pageSize=2
+GET https://api.geprice.com/api/items/search/ash?pageNumber=0&pageSize=2
 ```
 
 Example Response
@@ -159,7 +157,7 @@ Ths endpoing allows you to retrieve all items which are dropped from a given bos
 Example Endpoint
 
 ```
-GET <api_endpoint>/api/items/boss/1
+GET https://api.geprice.com/api/items/boss/1
 ```
 
 Example Response
@@ -202,5 +200,48 @@ Example Error
 ```json
 {
     "error": "Boss not found"
+}
+```
+
+### Prices
+
+This endpoint returns the information about recent price reports for a given item
+
+Example Endpoint
+```
+GET https://api.geprice.com/api/prices/59346?numDays=30
+```
+
+Example Response
+```json
+{
+  "itemId": 59346,
+  "lastBuy": 1180000000,
+  "lastSell": null,
+  "weekChange": 0,
+  "weekChangePercentage": "+0.00%",
+  "timeframe": "30",
+  "reports": [
+    {
+      "date": "2026-02-03T10:30:08.046490Z",
+      "price": 1180000000,
+      "reporter": "180896534680961024",
+      "transactionType": "instant_buy"
+    }
+  ]
+}
+```
+
+Example Errors
+
+```json
+{
+    "error": "Item not found"
+}
+```
+
+```json
+{
+    "error": "Invalid number of days [30 / 90 / all]"
 }
 ```

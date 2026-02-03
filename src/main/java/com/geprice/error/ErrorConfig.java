@@ -21,9 +21,17 @@ public class ErrorConfig {
         return response;
     }
 
+    @ExceptionHandler(GEPrice400Error.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handle400(GEPrice400Error message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", message.getMessage());
+        return response;
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public Map<String, Object> handle400() {
+    public Map<String, Object> handleNotReadable() {
         Map<String, Object> response = new HashMap<>();
         response.put("error", "Invalid request");
         return response;

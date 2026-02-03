@@ -1,7 +1,13 @@
 package com.geprice.pojo;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
@@ -13,35 +19,17 @@ import java.time.Instant;
 @Table(name = "submission")
 public class Submission {
     @Id
-    @GeneratedValue
-    @SequenceGenerator(name = "submission_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
-    @NonNull
     @Column(name = "user_id")
     private String userId;
 
     @Column(name = "item_id")
     private int itemId;
 
-    @Enumerated(EnumType.STRING)
-    @NonNull
-    @Column(name = "status")
-    private Status status;
-
     @Column(name = "value")
     private long value;
-
-    @NonNull
-    @Column(name = "timestamp")
-    private Instant timestamp;
-
-    @Column(name = "flagged")
-    private boolean flagged;
-
-    @Column(name = "approved")
-    private boolean approved;
 
     @Column(name = "listed")
     private boolean listed;
@@ -52,7 +40,27 @@ public class Submission {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    private enum Status {
-        buy, sell, instant_buy, instant_sell
-    }
+    @Column(name = "transaction_type")
+    private String transactionType;
+
+    @Column(name = "message_id")
+    private String messageId;
+
+    @Column(name = "channel_id")
+    private String channelId;
+
+    @Column(name = "review_status")
+    private String reviewStatus;
+
+    @Column(name = "flag_reason")
+    private String flagReason;
+
+    @Column(name = "flag_details")
+    private String flagDetails;
+
+    @Column(name = "reviewed_by")
+    private String reviewedBy;
+
+    @Column(name = "reviewed_at")
+    private Instant reviewedAt;
 }
