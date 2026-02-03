@@ -1,7 +1,7 @@
 # GEPrice
 
 This is the service layer for the GEPrice application.  This code allows for the
-querying of ge prices, as well as the uploading and maintenance of GE submissions.
+querying of ge prices and item information
 
 ## Endpoints
 
@@ -15,7 +15,7 @@ GET https://api.geprice.com/api/health
 ```
 
 Example Response 
-```
+```json
 {
     "status": "ok",
     "timestamp": "2026-02-01T20:46:17.895664100Z"
