@@ -34,7 +34,7 @@ public class PricesController {
 
     @GetMapping("/{itemId}")
     public Prices getRecent(@PathVariable String itemId,
-                            @RequestParam(value = "numDays", required = false, defaultValue = "all") String numDays) {
+                            @RequestParam(value = "numDays", required = false, defaultValue = "30") String numDays) {
         int item = Util.validateIntegerParameter(itemId, Constants.ITEM_NOT_FOUND);
         if (numDays == null || !List.of("30", "90", "all").contains(numDays)) {
             throw new GEPrice400Error("Invalid number of days [30 / 90 / all]");
@@ -62,7 +62,7 @@ public class PricesController {
             weekChange = latestReport.getPrice() - lastWeekReport.getPrice();
             weekChangePercentage = (double) weekChange / lastWeekReport.getPrice();
         } else {
-            log.warn("Recent prices for item {} not found", itemId);
+            log.warn("Recent prices for item {}xxxxxxxxxxxxxxxxxxxxx not found", itemId);
             weekChange = 0;
             weekChangePercentage = 0.0;
         }
