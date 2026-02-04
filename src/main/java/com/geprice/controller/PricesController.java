@@ -9,8 +9,6 @@ import com.geprice.pojo.Prices;
 import com.geprice.pojo.Report;
 import com.geprice.repository.ItemRepo;
 import com.geprice.repository.SubmissionRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Clock;
@@ -24,7 +22,6 @@ import java.util.Optional;
 @RequestMapping("/api/prices")
 public class PricesController {
 
-    private static final Logger log = LoggerFactory.getLogger(PricesController.class);
     private final SubmissionRepo submissionRepo;
     private final ItemRepo itemRepo;
 

@@ -11,6 +11,4 @@ import java.util.List;
 @Repository
 public interface CategoryItemRepo extends JpaRepository<@NonNull CategoryItem, @NonNull CategoryItemKey> {
     List<CategoryItem> findAllByCategoryId(int categoryId);
-
-    List<CategoryItem> findFirstByItemId(int itemId);
 }
