@@ -15,7 +15,7 @@ public class Prices {
     private String itemName;
     private Long lastBuy;
     private Long lastSell;
-    private double weekChange;
+    private long weekChange;
     private String weekChangePercentage;
     private String timeframe;
 

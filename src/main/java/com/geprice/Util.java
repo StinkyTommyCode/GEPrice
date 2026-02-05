@@ -28,12 +28,12 @@ public class Util {
     }
 
     public static String getWeeklyAveragePercentChange(int itemId) {
-        double average = getWeeklyAverage(itemId);
-        double previousAverage = getPreviousWeeklyAverage(itemId);
+        long average = getWeeklyAverage(itemId);
+        long previousAverage = getPreviousWeeklyAverage(itemId);
         return getPercentChange(average, previousAverage);
     }
 
-    public static String getPercentChange(double current, double previous) {
+    public static String getPercentChange(long current, long previous) {
         if (current == 0 && previous == 0) {
             return "+0.00%";
         }
@@ -43,26 +43,26 @@ public class Util {
         if (previous == 0) {
             return "+inf%";
         } else {
-            return String.format("%+.2f%%", (current - previous) / previous * 100.0);
+            return String.format("%+.2f%%", (double) (current - previous) / previous * 100.0);
         }
     }
 
 
-    public static double getWeeklyAverageChange(int itemId) {
-        double average = getWeeklyAverage(itemId);
-        double previousAverage = getPreviousWeeklyAverage(itemId);
+    public static long getWeeklyAverageChange(int itemId) {
+        long average = getWeeklyAverage(itemId);
+        long previousAverage = getPreviousWeeklyAverage(itemId);
         return average - previousAverage;
     }
 
-    public static double getWeeklyAverage(int itemId) {
+    public static long getWeeklyAverage(int itemId) {
         WeeklyAverageRepo repo = context.getBean(WeeklyAverageRepo.class);
         Optional<WeeklyAverage> avg = repo.findById(itemId);
-        return avg.map(WeeklyAverage::getAverage).orElse(0.0);
+        return avg.map(WeeklyAverage::getAverage).orElse(0L);
     }
 
-    public static double getPreviousWeeklyAverage(int itemId) {
+    public static long getPreviousWeeklyAverage(int itemId) {
         PreviousWeeklyAverageRepo repo = context.getBean(PreviousWeeklyAverageRepo.class);
         Optional<PreviousWeeklyAverage> avg = repo.findById(itemId);
-        return avg.map(PreviousWeeklyAverage::getAverage).orElse(0.0);
+        return avg.map(PreviousWeeklyAverage::getAverage).orElse(0L);
     }
 }

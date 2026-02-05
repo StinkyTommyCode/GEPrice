@@ -15,9 +15,9 @@ public class PreviousWeeklyAverage {
     private int itemId;
 
     @Column(name = "avg")
-    private Double average;
+    private Long average;
 
-    public double getAverage() {
+    public long getAverage() {
         return average != null ? average : 0;
     }
 }
