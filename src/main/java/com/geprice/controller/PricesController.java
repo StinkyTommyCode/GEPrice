@@ -64,4 +64,12 @@ public class PricesController {
                 .reports(reports)
                 .build();
     }
+
+    @GetMapping("/all")
+    public List<Report> getAllPrices() {
+        return submissionRepo.findAllByListedAndReviewStatusNot(true, "denied")
+                .stream()
+                .map(s -> Report.fromSubmission(s, true))
+                .toList();
+    }
 }

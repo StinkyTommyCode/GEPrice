@@ -8,6 +8,7 @@ import java.time.Instant;
 @Getter
 public class Report {
     private Instant date;
+    private int itemId;
     private long price;
     private String transactionType;
     private String reporter;
@@ -21,6 +22,7 @@ public class Report {
 
     public static Report fromSubmission(Submission submission, boolean includeSubmissionId) {
         Report report = new Report();
+        report.itemId = submission.getItemId();
         report.date = submission.getCreatedAt();
         report.price = submission.getValue();
         report.transactionType = submission.getTransactionType();
