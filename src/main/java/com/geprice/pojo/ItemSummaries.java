@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemSummaries {
-    private int itemId;
+    private int id;
     private String name;
     private int categoryId;
     private long currentWeekAverage;
