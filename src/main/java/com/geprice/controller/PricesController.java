@@ -7,8 +7,10 @@ import com.geprice.error.GEPrice404Error;
 import com.geprice.pojo.Item;
 import com.geprice.pojo.Prices;
 import com.geprice.pojo.Report;
+import com.geprice.pojo.ReportsPaged;
 import com.geprice.repository.ItemRepo;
 import com.geprice.repository.SubmissionRepo;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Clock;
@@ -67,9 +69,27 @@ public class PricesController {
 
     @GetMapping("/all")
     public List<Report> getAllPrices() {
-        return submissionRepo.findAllByListedAndReviewStatusNot(true, "denied")
+        return submissionRepo.findAllByListedAndReviewStatusNotOrderByCreatedAtDesc(true, "denied")
                 .stream()
                 .map(s -> Report.fromSubmission(s, true))
                 .toList();
+    }
+
+    @GetMapping("/all/paged")
+    public ReportsPaged getAllPricesPaged(@RequestParam(value = "pageSize", required = false, defaultValue = "20") String pageSizeParam,
+                                          @RequestParam(value = "pageNumber", required = false, defaultValue = "0") String pageNumberParam) {
+        int pageNumber = Util.validateIntegerParameter(pageNumberParam, "Invalid page number");
+        int pageSize = Util.validateIntegerParameter(pageSizeParam, "Invalid page size");
+
+        List<Report> reports =  submissionRepo.findAllByListedAndReviewStatusNotOrderByCreatedAtDesc(true, "denied", PageRequest.of(pageNumber, pageSize))
+                .stream()
+                .map(s -> Report.fromSubmission(s, true))
+                .toList();
+
+        return ReportsPaged.builder()
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .reports(reports)
+                .build();
     }
 }
