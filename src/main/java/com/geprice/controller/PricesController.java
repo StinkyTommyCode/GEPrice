@@ -71,22 +71,20 @@ public class PricesController {
         int pageSize = Util.validateIntegerParameter(pageSizeParam, "Invalid page size");
         boolean newestFirst = Boolean.parseBoolean(newestFirstParam);
 
-        List<Submission> submissions;
+        List<Report> reports;
         if (newestFirst) {
-            submissions = submissionRepo.findAllByListedAndReviewStatusNotOrderByIdDesc(true, "denied")
+            reports = submissionRepo.findAllByListedAndReviewStatusNotOrderByIdDesc(true, "denied")
                     .stream()
                     .dropWhile(s -> afterSubmission != -1 && s.getId() >= afterSubmission)
+                    .map(s -> Report.fromSubmission(s, true))
                     .toList();
         } else {
-            submissions = submissionRepo.findAllByListedAndReviewStatusNotOrderByIdAsc(true, "denied")
+            reports = submissionRepo.findAllByListedAndReviewStatusNotOrderByIdAsc(true, "denied")
                     .stream()
                     .dropWhile(s -> afterSubmission != -1 && s.getId() <= afterSubmission)
+                    .map(s -> Report.fromSubmission(s, true))
                     .toList();
         }
-
-        List<Report> reports = submissions.stream()
-                .map(s -> Report.fromSubmission(s, true))
-                .toList();
 
         return ReportsPaged.builder()
                 .totalItems(reports.size())
