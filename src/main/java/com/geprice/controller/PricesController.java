@@ -94,7 +94,7 @@ public class PricesController {
                 .pageSize(pageSize)
                 .afterSubmission(afterSubmission)
                 .newestFirst(newestFirst)
-                .reports(reports.subList(0, pageSize < 0 ? reports.size() : pageSize))
+                .reports(reports.subList(0, pageSize < 0 || pageSize > reports.size() ? reports.size() : pageSize))
                 .build();
     }
 }
