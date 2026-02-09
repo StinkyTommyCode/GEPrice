@@ -4,13 +4,9 @@ import com.geprice.Constants;
 import com.geprice.Util;
 import com.geprice.error.GEPrice400Error;
 import com.geprice.error.GEPrice404Error;
-import com.geprice.pojo.Item;
-import com.geprice.pojo.Prices;
-import com.geprice.pojo.Report;
-import com.geprice.pojo.ReportsPaged;
+import com.geprice.pojo.*;
 import com.geprice.repository.ItemRepo;
 import com.geprice.repository.SubmissionRepo;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Clock;
@@ -18,6 +14,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @RestController
 @ControllerAdvice
@@ -68,28 +65,36 @@ public class PricesController {
     }
 
     @GetMapping("/all")
-    public List<Report> getAllPrices() {
-        return submissionRepo.findAllByListedAndReviewStatusNotOrderByCreatedAtDesc(true, "denied")
-                .stream()
-                .map(s -> Report.fromSubmission(s, true))
-                .toList();
-    }
-
-    @GetMapping("/all/paged")
-    public ReportsPaged getAllPricesPaged(@RequestParam(value = "pageSize", required = false, defaultValue = "20") String pageSizeParam,
-                                          @RequestParam(value = "pageNumber", required = false, defaultValue = "0") String pageNumberParam) {
-        int pageNumber = Util.validateIntegerParameter(pageNumberParam, "Invalid page number");
+    public ReportsPaged getAllPricesPaged(@RequestParam(value = "pageSize", required = false, defaultValue = "-1") String pageSizeParam,
+                                          @RequestParam(value = "afterSubmission", required = false, defaultValue = "-1") String afterSubmissionParam,
+                                          @RequestParam(value = "newestFirst", required = false, defaultValue = "true") String newestFirstParam) {
+        int afterSubmission = Util.validateIntegerParameter(afterSubmissionParam, "Invalid submission number");
         int pageSize = Util.validateIntegerParameter(pageSizeParam, "Invalid page size");
+        boolean newestFirst = Boolean.parseBoolean(newestFirstParam);
 
-        List<Report> reports =  submissionRepo.findAllByListedAndReviewStatusNotOrderByCreatedAtDesc(true, "denied", PageRequest.of(pageNumber, pageSize))
-                .stream()
+        List<Submission> submissions;
+        if (newestFirst) {
+            submissions = submissionRepo.findAllByListedAndReviewStatusNotOrderByCreatedAtDesc(true, "denied");
+        } else {
+            submissions = submissionRepo.findAllByListedAndReviewStatusNotOrderByCreatedAtAsc(true, "denied");
+        }
+
+        int idx = IntStream.range(0, submissions.size())
+                .filter(i -> submissions.get(i).getId() == afterSubmission)
+                .findFirst()
+                .orElse(-1);
+
+        List<Report> reports = submissions.stream()
+                .skip(idx + 1)
                 .map(s -> Report.fromSubmission(s, true))
                 .toList();
 
         return ReportsPaged.builder()
-                .pageNumber(pageNumber)
+                .totalItems(reports.size())
                 .pageSize(pageSize)
-                .reports(reports)
+                .afterSubmission(afterSubmission)
+                .newestFirst(newestFirst)
+                .reports(reports.subList(0, pageSize < 0 ? reports.size() : pageSize))
                 .build();
     }
 }

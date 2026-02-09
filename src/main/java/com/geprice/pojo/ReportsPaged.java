@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportsPaged {
     private List<Report> reports;
-    private int pageNumber;
+    private int totalItems;
     private int pageSize;
+    private long afterSubmission;
+    private boolean newestFirst;
 }
