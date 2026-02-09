@@ -47,8 +47,24 @@ public class PricesControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        Mockito.lenient().when(submissionRepo.findAllByListedAndReviewStatusNotOrderByIdAsc(anyBoolean(), anyString())).thenReturn(submissions);
-        Mockito.lenient().when(submissionRepo.findAllByListedAndReviewStatusNotOrderByIdDesc(anyBoolean(), anyString())).thenReturn(submissions.reversed());
+        Mockito.lenient().when(submissionRepo.findListedOrderByIdAsc(anyLong(), anyLong()))
+                .thenAnswer(invocation -> new ArrayList<>(submissions).stream()
+                        .filter(s -> (long)invocation.getArgument(0) < 0 || s.getId() > (long)invocation.getArgument(0))
+                        .limit(invocation.getArgument(1))
+                        .toList());
+        Mockito.lenient().when(submissionRepo.findListedOrderByIdDesc(anyLong(), anyLong()))
+                .thenAnswer(invocation -> new ArrayList<>(submissions).reversed().stream()
+                        .filter(s -> (long)invocation.getArgument(0) < 0 || s.getId() < (long)invocation.getArgument(0))
+                        .limit(invocation.getArgument(1))
+                        .toList());
+        Mockito.lenient().when(submissionRepo.findListedOrderByIdAscCount(anyLong()))
+                .thenAnswer(invocation -> new ArrayList<>(submissions).stream()
+                        .filter(s -> (long)invocation.getArgument(0) < 0 || s.getId() > (long)invocation.getArgument(0))
+                        .count());
+        Mockito.lenient().when(submissionRepo.findListedOrderByIdDescCount(anyLong()))
+                .thenAnswer(invocation -> new ArrayList<>(submissions).reversed().stream()
+                        .filter(s -> (long)invocation.getArgument(0) < 0 || s.getId() < (long)invocation.getArgument(0))
+                        .count());
     }
 
     @Test

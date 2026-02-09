@@ -42,7 +42,7 @@ public class PricesController {
             throw new GEPrice404Error(Constants.ITEM_NOT_FOUND);
         }
 
-        List<Report> reports = submissionRepo.findAllByItemIdAndListedAndReviewStatusNotOrderByCreatedAtDesc(item, true, "denied")
+        List<Report> reports = submissionRepo.findListedByItemId(item)
                 .stream().filter(s -> "all".equals(numDays) ||
                         s.getCreatedAt().isAfter(Instant.now(Clock.systemUTC()).minus(Integer.parseInt(numDays), ChronoUnit.DAYS)))
                 .map(s -> Report.fromSubmission(s, Boolean.parseBoolean(includeSubmissionId))).toList();
@@ -72,22 +72,23 @@ public class PricesController {
         boolean newestFirst = Boolean.parseBoolean(newestFirstParam);
 
         List<Report> reports;
+        long totalItems;
         if (newestFirst) {
-            reports = submissionRepo.findAllByListedAndReviewStatusNotOrderByIdDesc(true, "denied")
+            totalItems = submissionRepo.findListedOrderByIdDescCount(afterSubmission);
+            reports = submissionRepo.findListedOrderByIdDesc(afterSubmission, pageSize < 0 ? Integer.MAX_VALUE : pageSize)
                     .stream()
-                    .dropWhile(s -> afterSubmission != -1 && s.getId() >= afterSubmission)
                     .map(s -> Report.fromSubmission(s, true))
                     .toList();
         } else {
-            reports = submissionRepo.findAllByListedAndReviewStatusNotOrderByIdAsc(true, "denied")
+            totalItems = submissionRepo.findListedOrderByIdAscCount(afterSubmission);
+            reports = submissionRepo.findListedOrderByIdAsc(afterSubmission, pageSize < 0 ? Integer.MAX_VALUE : pageSize)
                     .stream()
-                    .dropWhile(s -> afterSubmission != -1 && s.getId() <= afterSubmission)
                     .map(s -> Report.fromSubmission(s, true))
                     .toList();
         }
 
         return ReportsPaged.builder()
-                .totalItems(reports.size())
+                .totalItems(totalItems)
                 .pageSize(pageSize)
                 .afterSubmission(afterSubmission)
                 .newestFirst(newestFirst)
